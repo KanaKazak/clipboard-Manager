@@ -3,6 +3,7 @@ import pyperclip
 import json
 import sqlite3
 
+#Initialize the sqlite3 database
 def init_db():
     conn = sqlite3.connect("clipboard.db")  # creates file if not exists
     cursor = conn.cursor()
@@ -18,29 +19,17 @@ def init_db():
     conn.commit()
     conn.close()
 
-
-# Initialize a dictionary to store clipboard history
-
-def load_history():
-    """Load clipboard history from a file."""
-    try:
-        with open('clipboard_history.json', 'r') as file:
-            content = file.read().strip()
-            if not content:
-                print("History file was empty. Starting fresh.")
-                return {}
-            return json.loads(content)
-    except (FileNotFoundError, json.JSONDecodeError):
-        print("History file missing or corrupted. Starting fresh.")
-        return {}
-
-def save_history(history: dict) -> None:
-    """Save clipboard history to a file."""
-    with open('clipboard_history.json', 'w') as file:
-        json.dump(history, file, indent=4)
+#Function to commit clipboard history to the database
+def save_to_db(content: str, timestamp: str) -> None:
+    conn = sqlite3.connect("clipboard.db")
+    cursor = conn.cursor()
+    cursor.execute("INSERT INTO clipboard_history (content, timestamp) VALUES (?, ?)", (content, timestamp))
+    conn.commit()
+    conn.close()
+    print(f"Inserted into DB at {timestamp}")
 
 def main():
-    clipboard_history = load_history()
+    init_db()
     # Set up the clipboard monitoring
     print("Monitoring clipboard for changes...")
     last_content = ""
@@ -54,10 +43,7 @@ def main():
             print(f"Clipboard updated: {current_content}")
             last_content = current_content
             # Store the new content in the history
-            if current_content not in clipboard_history:
-                clipboard_history[current_content] = time.ctime()
-                print(f"Saved new clipboard entry at {time.ctime()}")
-                save_history(clipboard_history)
+            save_to_db(current_content, time.ctime())
         # Sleep for a short duration to avoid busy waiting
         time.sleep(1)
 # A good practice to ensure the script runs only when executed directly
