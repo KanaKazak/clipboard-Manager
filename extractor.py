@@ -1,7 +1,7 @@
 import sqlite3
 import csv
 
-def export_to_csv(db_path="dist/clipboard.db", output_file="dist/clipboard_export.csv"):
+def export_to_csv(db_path="clipboard.db", output_file="clipboard_export.csv"):
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM clipboard_history")

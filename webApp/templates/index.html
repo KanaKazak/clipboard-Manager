@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<html lang="en">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <title>Clipboard History Viewer</title>
+</head>
+<body>
+    <h1>Clipboard History Viewer</h1>
+    <p>Welcome! See your clipboard history here:</p>
+    <a href="{{ url_for('history') }}">Go to Clipboard History</a>
+</body>
+</html>
