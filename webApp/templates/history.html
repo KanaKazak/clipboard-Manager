@@ -9,7 +9,14 @@
 <body>
     <h1>Clipboard History (Page {{ page }} of {{ total_pages }})</h1>
     <input type="text" id="searchBox" placeholder="Filter clipboard entries..." onkeyup="filterList()" />
-    <ul id="historyList"></ul>
+    <ul id="historyList">
+        {% for entry in history %}
+            <li>
+                <span class="entry-text">{{ entry[1][:100] }}{% if entry[1]|length > 100 %}...{% endif %}</span>
+                <button class="copy-btn" onclick="navigator.clipboard.writeText(`{{ entry[1]|e }}`)">Copy</button>
+            </li>
+        {% endfor %}
+    </ul>
     <nav>
         {% if page > 1 %}
             <a href="{{ url_for('history', page=page-1) }}">Previous</a>

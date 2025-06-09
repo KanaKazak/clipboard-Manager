@@ -49,18 +49,22 @@ def history():
 
 @app.route('/api/history')
 def api_history():
+    page = request.args.get('page', default=1, type=int)
+    per_page = 10
+    offset = (page - 1) * per_page
+
     conn = sqlite3.connect(db_path)
     cursor = conn.cursor()
-    cursor.execute("SELECT * FROM clipboard_history ORDER BY timestamp DESC LIMIT 20")
+    cursor.execute("SELECT * FROM clipboard_history ORDER BY timestamp DESC LIMIT ? OFFSET ?", (per_page, offset))
     history = cursor.fetchall()
     conn.close()
 
-    # Convert data to list of dicts for JSON serialization
     history_list = [
         {"id": row[0], "content": row[1], "timestamp": row[2]}
         for row in history
     ]
     return jsonify(history_list)
+
 
 @app.route('/api/search')
 def api_search():

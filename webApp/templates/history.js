@@ -39,47 +39,21 @@ function renderEntry(entry) {
 
 
 async function fetchHistory() {
-    try {
-        const response = await fetch('/api/history');
-        const data = await response.json();
-
-        const ul = document.getElementById('historyList');
-        ul.innerHTML = ''; // Clear current list
-
-        data.forEach(entry => {
-            const li = document.createElement('li');
-
-            let content = entry.content;
-            let displayText = content.length > 100 ? content.substring(0, 100) + "..." : content;
-
-            li.innerHTML = `<span class="entry-text">${displayText}</span>`;
-
-            // Toggle full text on click
-            if (content.length > 100) {
-                li.addEventListener('click', () => {
-                    const span = li.querySelector('.entry-text');
-                    if (span.textContent.endsWith("...")) {
-                        span.textContent = content;
-                    } else {
-                        span.textContent = displayText;
-                    }
-                });
-                li.style.cursor = "pointer";
-            }
-
-            // Copy to clipboard button
-            const copyBtn = document.createElement('button');
-            copyBtn.textContent = 'Copy';
-            copyBtn.onclick = () => navigator.clipboard.writeText(entry.content);
-            copyBtn.className = 'copy-btn';
-            li.appendChild(copyBtn);
-
-            ul.appendChild(renderEntry(entry));
-;
-        });
-    } catch (error) {
-        console.error('Error fetching history:', error);
+    const urlParams = new URLSearchParams(window.location.search);
+    const page = urlParams.get('page') || 1;
+    const response = await fetch(`/api/history?page=${page}`);
+    if (!response.ok) {
+        console.error('Failed to fetch history:', response.statusText);
+        return;
     }
+    const data = await response.json();
+
+    const ul = document.getElementById('historyList');
+    ul.innerHTML = ''; // Clear current list
+
+    data.forEach(entry => {
+        ul.appendChild(renderEntry(entry));
+    });
 }
 
 async function filterList() {
